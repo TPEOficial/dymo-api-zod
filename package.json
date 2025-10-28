@@ -1,0 +1,85 @@
+{
+  "name": "@dymo-api/zod",
+  "version": "1.0.0",
+  "description": "Flow system for Dymo API.",
+  "main": "dist/cjs/dymo-api.js",
+  "module": "dist/esm/dymo-api.js",
+  "types": "dist/types/dymo-api.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/dymo-api.cjs",
+      "import": "./dist/esm/dymo-api.js",
+      "types": "./dist/types/dymo-api.d.ts"
+    },
+    "./*": {
+      "require": "./dist/cjs/**/*.cjs",
+      "import": "./dist/esm/**/*.js"
+    }
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build:cjs": "tsc -p tsconfig.cjs.json && tsc-alias -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json && tsc-alias -p tsconfig.esm.json",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm && node ./scripts/rename.js",
+    "start": "ts-node src/dymo-api.ts",
+    "prepublishOnly": "npm run build",
+    "test": "jest --runInBand --max-old-space-size=4096",
+    "test:watch": "jest --runInBand --watch --max-old-space-size=4096"
+  },
+  "repository": {
+    "url": "https://github.com/TPEOficial/dymo-api-zod"
+  },
+  "keywords": [
+    "Dymo",
+    "Dymo API",
+    "TPEOficial",
+    "Ciphera",
+    "email verification",
+    "email validation",
+    "disposable email detector",
+    "disposable checker",
+    "fraud detection",
+    "anti fraud",
+    "multiaccount detection",
+    "fake user prevention",
+    "bot detection",
+    "spam protection",
+    "user validation"
+  ],
+  "author": "TPEOficial LLC",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/TPEOficial/dymo-api-node/issues"
+  },
+  "homepage": "https://dymo.tpeoficial.com",
+  "dependencies": {
+    "dymo-api": "^1.2.20",
+    "zod": "^4.1.12"
+  },
+  "contributors": [
+    "TPEOficial (https://github.com/TPEOficial)",
+    "FJRG2007 (https://github.com/FJRG2007)"
+  ],
+  "devDependencies": {
+    "@types/axios": "^0.9.36",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.9.3",
+    "dotenv": "^17.2.2",
+    "jest": "^30.1.3",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29.4.4",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
+    "typescript": "^5.5.4"
+  },
+  "prettier": {
+    "tabWidth": 4,
+    "useTabs": false
+  }
+}
