@@ -74,6 +74,73 @@ class DymoAPIZod {
     };
 
     /**
+         * Validates the given IP against the configured rules.
+         *
+         * This method requires either the root API key or the API key to be set.
+         * If neither is set, it will throw an error.
+         *
+         * @param {string} [ip] - IP address to validate.
+         * @param {NegativeEmailRules[]} [rules] - Optional rules for validation. Some rules are premium features.
+         * @important
+         * **⚠️ TOR_NETWORK and HIGH_RISK_SCORE are [PREMIUM](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier) features.**
+         * @returns {Promise<Interfaces.IPValidatorResponse>} Resolves with the validation response.
+         * @throws Will throw an error if validation cannot be performed.
+         *
+         * @example
+         * const valid = await isValidIP("52.94.236.248", { deny: ["FRAUD", "TOR_NETWORK", "COUNTRY:RU"] });
+         * 
+         * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/ip-validation)
+         */
+    async isValidIP(
+        ip: Interfaces.IPValidator,
+        rules: Interfaces.IPValidatorRules
+    ): Promise<Interfaces.IPValidatorResponse> {
+        return await this.dymoAPIClient.isValidIP(ip, rules);
+    };
+
+    ipSchema() {
+        return z.string().regex(/^(?:\d{1,3}\.){3}\d{1,3}$|^(?:[a-fA-F0-9]{0,4}:){2,7}[a-fA-F0-9]{0,4}$/).transform(async (v) => {
+            const res = await this.dymoAPIClient.isValidIP(v);
+            console.log(res);
+            if (!res.allow) throw new Error("Invalid IP");
+            return res.ip || v;
+        });
+    };
+
+    /**
+     * Validates the given email against the configured rules.
+     *
+     * This method requires either the root API key or the API key to be set.
+     * If neither is set, it will throw an error.
+     *
+     * @param {string} [phone] - Phone number to validate.
+     * @param {NegativePhoneRules[]} [rules] - Optional rules for validation. Some rules are premium features.
+     * @important
+     * **⚠️ HIGH_RISK_SCORE is a [PREMIUM](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier) feature.**
+     * @returns {Promise<Interfaces.EmailValidatorResponse>} Resolves with the validation response.
+     * @throws Will throw an error if validation cannot be performed.
+     *
+     * @example
+     * const valid = await dymoClient.isValidPhone("+34617509462", { deny: ["FRAUD", "INVALID"] });
+     * 
+     * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/phone-validation)
+     */
+    async isValidPhone(
+        phone: Interfaces.PhoneValidator,
+        rules: Interfaces.PhoneValidatorRules
+    ): Promise<Interfaces.PhoneValidatorResponse> {
+        return await this.dymoAPIClient.isValidPhone(phone, rules);
+    };
+
+    phoneSchema() {
+        return z.string().transform(async (v) => {
+            const res = await this.dymoAPIClient.isValidPhone(v);
+            if (!res.allow) throw new Error("Invalid phone");
+            return res.phone || v;
+        });
+    };
+
+    /**
      * Validates a password based on the given parameters.
      *
      * This method requires the password to be provided in the data object.

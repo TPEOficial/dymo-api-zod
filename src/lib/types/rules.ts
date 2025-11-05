@@ -1,7 +1,24 @@
-import type { EmailValidatorRules } from "dymo-api";
-import { NegativePhoneRules, NegativeSensitiveInfoRules } from "./data-verifier";
+import { NegativeEmailRules, NegativeIPRules, NegativePhoneRules, NegativeSensitiveInfoRules } from "./data-verifier";
 
 type Mode = "LIVE" | "DRY_RUN";
+
+export type NegativeWafRules = "FRAUD" | "VPN" | "PROXY" | "TOR_NETWORK";
+
+export interface WafRules {
+    mode?: Mode;
+    //allowBots?: WellKnownBots.WellKnownBotOrCategory[];
+    deny?: NegativeWafRules[];
+}
+
+export interface EmailValidatorRules {
+    mode?: Mode;
+    deny: NegativeEmailRules[];
+}
+
+export interface IPValidatorRules {
+    mode?: Mode;
+    deny: NegativeIPRules[];
+}
 
 export interface PhoneValidatorRules {
     mode?: Mode;
@@ -16,6 +33,8 @@ export interface SensitiveInfoRules {
 // -------------------- DYMO MAIN CLIENT RULES -------------------- //
 export interface Rules {
     email?: EmailValidatorRules;
+    ip?: IPValidatorRules;
     phone?: PhoneValidatorRules;
     sensitiveInfo?: SensitiveInfoRules;
+    waf?: WafRules;
 }

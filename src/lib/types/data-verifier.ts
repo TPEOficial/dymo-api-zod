@@ -1,5 +1,4 @@
 import { MxRecord } from "dns";
-import type { NegativeEmailRules } from "dymo-api";
 import { Email, Phone, CreditCard } from "./primitives";
 
 export type VerifyPlugins = "blocklist" | "gravatar" | "compromiseDetector" | "mxRecords" | "nsfw" | "reputation" | "riskScore" | "torNetwork" | "typosquatting" | "urlShortener";
@@ -72,8 +71,45 @@ export interface Validator {
 
 // ------------ EMAIL VALIDATOR ------------ //
 export type EmailValidator = Email;
+/**
+ * @typedef {"FRAUD"|"INVALID"|"NO_MX_RECORDS"|"PROXIED_EMAIL"|"FREE_SUBDOMAIN"|"PERSONAL"|"CORPORATE"|"NO_REPLY"|"ROLE_ACCOUNT"|"REACHABLE"|"HIGH_RISK_SCORE"} NegativeEmailRules
+ *
+ * @description
+ * Values indicating why an email is considered negative.
+ * ⚠️ NO_MX_RECORDS, PROXIED_EMAIL, FREE_SUBDOMAIN, CORPORATE, NO_GRAVATAR, and HIGH_RISK_SCORE are premium features.
+ */
+export type NegativeEmailRules =
+    | "FRAUD"
+    | "INVALID"
+    | "NO_MX_RECORDS"        // ⚠️ Premium
+    | "PROXIED_EMAIL"
+    | "FREE_SUBDOMAIN"
+    | "PERSONAL_EMAIL"
+    | "CORPORATE_EMAIL"
+    | "NO_REPLY_EMAIL"
+    | "ROLE_ACCOUNT"
+    | "NO_GRAVATAR"          // ⚠️ Premium
+    | "NO_REACHABLE"         // ⚠️ Premium
+    | "HIGH_RISK_SCORE";     // ⚠️ Premium
+
+// ------------ IP VALIDATOR ------------ //
+export type IPValidator = string;
+/**
+ * @typedef {"FRAUD"|"INVALID"|"HIGH_RISK_SCORE"} NegativeIPRules
+ *
+ * @description
+ * Values indicating why an email is considered negative.
+ * ⚠️ TOR_NETWORK and HIGH_RISK_SCORE are premium features.
+ */
+export type NegativeIPRules =
+    | "FRAUD"
+    | "INVALID"
+    | "TOR_NETWORK"        // ⚠️ Premium
+    | "HIGH_RISK_SCORE"    // ⚠️ Premium
+    | `COUNTRY:${string}${string}`; // Two-char country code.
 
 // ------------ PHONE VALIDATOR ------------ //
+export type PhoneValidator = Phone;
 /**
  * @typedef {"FRAUD"|"INVALID"|"HIGH_RISK_SCORE"} NegativePhoneRules
  * ⚠️ HIGH_RISK_SCORE is a premium feature.
@@ -107,6 +143,44 @@ export type EmailValidatorResponse = {
 
     /** Detailed analysis of the email validation result. */
     response: DataEmailValidationAnalysis;
+};
+
+// ------------ IP VALIDATOR ------------ //
+
+/**
+ * Response returned by the email validator.
+ */
+export type IPValidatorResponse = {
+    /** The validated email address. */
+    ip: string;
+
+    /** Whether the email is allowed (not blocked/fraudulent). */
+    allow: boolean;
+
+    /** List of rules indicating why the email may be considered negative. */
+    reasons: NegativeIPRules[];
+
+    /** Detailed analysis of the email validation result. */
+    response: DataIPValidationAnalysis;
+};
+
+// ------------ PHONE VALIDATOR ------------ //
+
+/**
+ * Response returned by the phone validator.
+ */
+export type PhoneValidatorResponse = {
+    /** The validated phone number. */
+    phone: string;
+
+    /** Whether the email is allowed (not blocked/fraudulent). */
+    allow: boolean;
+
+    /** List of rules indicating why the email may be considered negative. */
+    reasons: NegativePhoneRules[];
+
+    /** Detailed analysis of the email validation result. */
+    response: DataPhoneValidationAnalysis;
 };
 
 // ------------ SENSITIVE INFO VALIDATOR ------------ //
@@ -199,6 +273,155 @@ export interface DataEmailValidationAnalysis {
     };
 }
 
+/**
+ * Detailed analysis of an IP validation.
+ */
+export interface DataIPValidationAnalysis {
+
+    /** Whether the IP address is valid. */
+    valid: boolean;
+
+    /** The type of IP address. */
+    type: "IPv4" | "IPv6" | "Invalid";
+
+    /** The IP class for the IP address. */
+    class: "A" | "B" | "C" | "D" | "E" | "Unknown" | "None";
+
+    /** Whether the IP address is fraudulent. */
+    fraud: boolean;
+
+    /** The IP address being analyzed. */
+    ip: string;
+
+    /** The continent for the IP address. */
+    continent: string;
+
+    /** The continent code for the IP address. */
+    continentCode: string;
+
+    /** The country for the IP address. */
+    country: string;
+
+    /** The country code for the IP address. */
+    countryCode: string;
+
+    /** The region code for the IP address. */
+    region: string;
+
+    /** The region name for the IP address. */
+    regionName: string;
+
+    /** The city for the IP address. */
+    city: string;
+
+    /** The district for the IP address. */
+    district: string;
+
+    /** The postal code for the IP address. */
+    zipCode: string;
+
+    /** The latitude for the IP address. */
+    lat: number;
+
+    /** The longitude for the IP address. */
+    lon: number;
+
+    /** The timezone for the IP address. */
+    timezone: string;
+
+    /** The timezone offset for the IP address. */
+    offset: number;
+
+    /** The currency for the IP address. */
+    currency: string;
+
+    /** The ISP for the IP address. */
+    isp: string;
+
+    /** The organization for the IP address. */
+    org: string;
+
+    /** The AS number for the IP address. */
+    as: string;
+
+    /** The AS name for the IP address. */
+    asname: string;
+
+    /** Whether the IP address is a mobile device. */
+    mobile: boolean;
+
+    /** Whether the IP address is a proxy. */
+    proxy: boolean;
+
+    /** Whether the IP address is hosting a website. */
+    hosting: boolean;
+
+    /** Results from optional validation plugins. */
+    plugins: {
+
+        /** Whether the IP address is blocked by a blocklist. */
+        blocklist?: boolean;
+
+        /** The risk score for the IP address. */
+        riskScore?: number;
+    };
+}
+
+/**
+ * Detailed analysis of an phone validation.
+ */
+export interface DataPhoneValidationAnalysis {
+    /** Whether the phone number is valid. */
+    valid: boolean;
+
+    /** Whether the phone number is fraudulent. */
+    fraud: boolean;
+
+    /** The phone number being analyzed. */
+    phone: string;
+
+    /** The country code for the phone number. */
+    prefix: string;
+
+    /** The line type for the phone number. */
+    number: string;
+
+    /** The line type for the phone number. */
+    lineType: "PREMIUM_RATE" | "TOLL_FREE" | "SHARED_COST" | "VOIP" | "PERSONAL_NUMBER" | "PAGER" | "UAN" | "VOICEMAIL" | "FIXED_LINE_OR_MOBILE" | "FIXED_LINE" | "MOBILE" | "Unknown";
+
+    /** The carrier information for the phone number. */
+    carrierInfo: {
+
+        /** The carrier name for the phone number. */
+        carrierName: string;
+
+        /** The accuracy of the carrier information. */
+        accuracy: number;
+
+        /** The carrier country for the phone number. */
+        carrierCountry: string;
+
+        /** The carrier country code for the phone number. */
+        carrierCountryCode: string;
+    };
+
+    /** The country for the phone number. */
+    country: string;
+
+    /** The country code for the phone number. */
+    countryCode: string;
+
+    /** Results from optional validation plugins. */
+    plugins: {
+
+        /** Whether the phone number is blocked by a blocklist. */
+        blocklist?: boolean;
+
+        /** The risk score for the phone number. */
+        riskScore?: number;
+    };
+}
+
 export interface DataValidationAnalysis {
     /** URL validation result. */
     url: {
@@ -257,58 +480,7 @@ export interface DataValidationAnalysis {
     email: DataEmailValidationAnalysis;
 
     /** Phone validation result. */
-    phone: {
-
-        /** Whether the phone number is valid. */
-        valid: boolean;
-
-        /** Whether the phone number is fraudulent. */
-        fraud: boolean;
-
-        /** The phone number being analyzed. */
-        phone: string;
-
-        /** The country code for the phone number. */
-        prefix: string;
-
-        /** The line type for the phone number. */
-        number: string;
-
-        /** The line type for the phone number. */
-        lineType: "PREMIUM_RATE" | "TOLL_FREE" | "SHARED_COST" | "VOIP" | "PERSONAL_NUMBER" | "PAGER" | "UAN" | "VOICEMAIL" | "FIXED_LINE_OR_MOBILE" | "FIXED_LINE" | "MOBILE" | "Unknown";
-        
-        /** The carrier information for the phone number. */
-        carrierInfo: {
-
-            /** The carrier name for the phone number. */
-            carrierName: string;
-
-            /** The accuracy of the carrier information. */
-            accuracy: number;
-
-            /** The carrier country for the phone number. */
-            carrierCountry: string;
-
-            /** The carrier country code for the phone number. */
-            carrierCountryCode: string;
-        };
-
-        /** The country for the phone number. */
-        country: string;
-
-        /** The country code for the phone number. */
-        countryCode: string;
-
-        /** Results from optional validation plugins. */
-        plugins: {
-
-            /** Whether the phone number is blocked by a blocklist. */
-            blocklist?: boolean;
-
-            /** The risk score for the phone number. */
-            riskScore?: number;
-        };
-    };
+    phone: DataPhoneValidationAnalysis;
 
     /** Domain validation result. */
     domain: {
@@ -345,7 +517,7 @@ export interface DataValidationAnalysis {
 
             /** Reputation plugin results. */
             reputation?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
-            
+
             /** Risk score for the domain. */
             riskScore?: number;
 
@@ -390,96 +562,7 @@ export interface DataValidationAnalysis {
     };
 
     /** IP validation result. */
-    ip: {
-
-        /** Whether the IP address is valid. */
-        valid: boolean;
-
-        /** The type of IP address. */
-        type: "IPv4" | "IPv6" | "Invalid";
-
-        /** The IP class for the IP address. */
-        class: "A" | "B" | "C" | "D" | "E" | "Unknown" | "None";
-
-        /** Whether the IP address is fraudulent. */
-        fraud: boolean;
-
-        /** The IP address being analyzed. */
-        ip: string;
-
-        /** The continent for the IP address. */
-        continent: string;
-
-        /** The continent code for the IP address. */
-        continentCode: string;
-
-        /** The country for the IP address. */
-        country: string;
-
-        /** The country code for the IP address. */
-        countryCode: string;
-
-        /** The region code for the IP address. */
-        region: string;
-
-        /** The region name for the IP address. */
-        regionName: string;
-
-        /** The city for the IP address. */
-        city: string;
-
-        /** The district for the IP address. */
-        district: string;
-
-        /** The postal code for the IP address. */
-        zipCode: string;
-
-        /** The latitude for the IP address. */
-        lat: number;
-
-        /** The longitude for the IP address. */
-        lon: number;
-
-        /** The timezone for the IP address. */
-        timezone: string;
-
-        /** The timezone offset for the IP address. */
-        offset: number;
-
-        /** The currency for the IP address. */
-        currency: string;
-
-        /** The ISP for the IP address. */
-        isp: string;
-
-        /** The organization for the IP address. */
-        org: string;
-
-        /** The AS number for the IP address. */
-        as: string;
-
-        /** The AS name for the IP address. */
-        asname: string;
-
-        /** Whether the IP address is a mobile device. */
-        mobile: boolean;
-
-        /** Whether the IP address is a proxy. */
-        proxy: boolean;
-
-        /** Whether the IP address is hosting a website. */
-        hosting: boolean;
-
-        /** Results from optional validation plugins. */
-        plugins: {
-
-            /** Whether the IP address is blocked by a blocklist. */
-            blocklist?: boolean;
-
-            /** The risk score for the IP address. */
-            riskScore?: number;
-        };
-    };
+    ip: DataIPValidationAnalysis;
 
     /** Wallet validation result. */
     wallet: {

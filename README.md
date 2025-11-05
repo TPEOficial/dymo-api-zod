@@ -119,10 +119,10 @@ You can also create schemas for IPs, phones, and passwords:
 ```ts
 const userSchema = z.object({
     email: dymoClient.emailSchema(),
-
-    // Coming Soon.
     ip: dymoClient.ipSchema(),
     phone: dymoClient.phoneSchema(),
+
+    // Coming Soon.
     password: dymoClient.passwordSchema()
 });
 ```
