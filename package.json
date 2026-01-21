@@ -1,6 +1,6 @@
 {
   "name": "@dymo-api/zod",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Flow system for Dymo API.",
   "main": "dist/cjs/dymo-api.cjs",
   "module": "dist/esm/dymo-api.js",
@@ -57,7 +57,7 @@
   },
   "homepage": "https://dymo.tpeoficial.com",
   "dependencies": {
-    "dymo-api": "^1.2.35",
+    "dymo-api": "^1.2.36",
     "zod": "^4.3.5"
   },
   "contributors": [
