@@ -1,5 +1,5 @@
 import { z } from "zod";
-import DymoAPI from "dymo-api";
+import DymoAPI, { type ResilienceConfig } from "dymo-api";
 import type { EmailValidatorRules } from "dymo-api";
 import * as Interfaces from "./lib/types/interfaces";
 
@@ -10,6 +10,8 @@ class DymoAPIZod {
      * @param {string} [options.rootApiKey] - The root API key.
      * @param {string} [options.apiKey] - The API key.
      * @param {string} [options.baseUrl] - Whether to use a local server instead of the cloud server.
+     * @param {Object} [options.rules] - The validation rules.
+     * @param {Object} [options.resilience] - The resilience configuration.
      * @description
      * This is the main class to interact with the Dymo API. It should be
      * instantiated with the root API key and the API key. The root API key is
@@ -25,18 +27,21 @@ class DymoAPIZod {
         rootApiKey = null,
         apiKey = null,
         baseUrl,
-        rules = {}
+        rules = {},
+        resilience
     }: {
         rootApiKey?: string | null;
         apiKey?: string | null;
         baseUrl?: string;
         rules?: Interfaces.Rules;
+        resilience?: ResilienceConfig;
     } = {}) {
         this.dymoAPIClient = new DymoAPI({
             rootApiKey,
             apiKey,
             baseUrl,
-            rules
+            rules,
+            resilience
         });
     };
 
