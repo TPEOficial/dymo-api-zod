@@ -106,7 +106,6 @@ class DymoAPIZod {
     ipSchema() {
         return z.string().regex(/^(?:\d{1,3}\.){3}\d{1,3}$|^(?:[a-fA-F0-9]{0,4}:){2,7}[a-fA-F0-9]{0,4}$/).transform(async (v) => {
             const res = await this.dymoAPIClient.isValidIP(v);
-            console.log(res);
             if (!res.allow) throw new Error("Invalid IP");
             return res.ip || v;
         });
