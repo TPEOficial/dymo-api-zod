@@ -57,7 +57,7 @@
   },
   "homepage": "https://dymo.tpeoficial.com",
   "dependencies": {
-    "dymo-api": "^1.2.38",
+    "dymo-api": "^1.2.43",
     "zod": "^4.3.5"
   },
   "contributors": [

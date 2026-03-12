@@ -104,6 +104,8 @@ export type IPValidator = string;
 export type NegativeIPRules =
     | "FRAUD"
     | "INVALID"
+    | "VPN"
+    | "PROXY"
     | "TOR_NETWORK"        // ⚠️ Premium
     | "HIGH_RISK_SCORE"    // ⚠️ Premium
     | `COUNTRY:${Char}${Char}`; // Two-char country code.
@@ -200,6 +202,22 @@ export type SensitiveInfoResponse = {
     reasons: NegativeSensitiveInfoRules[];
 };
 
+export type IsReachable = "safe" | "invalid" | "risky" | "unknown";
+
+export interface SmtpDetails {
+    canConnectSmtp: boolean;
+    deliverable: boolean;
+    catchAll: boolean;
+    disabled: boolean;
+    fullInbox: boolean;
+    blacklisted: boolean;
+}
+
+export interface ReachableResult {
+    reachability: IsReachable;
+    smtp: SmtpDetails;
+}
+
 /**
  * Detailed analysis of an email validation.
  */
@@ -261,7 +279,7 @@ export interface DataEmailValidationAnalysis {
         nsfw?: boolean;
 
         /** Whether the email is reachable. */
-        reachable?: boolean;
+        reachable?: ReachableResult;
 
         /** Reputation plugin results. */
         reputation?: TyposquattingPlugin;
@@ -356,6 +374,9 @@ export interface DataIPValidationAnalysis {
 
     /** Whether the IP address is a mobile device. */
     mobile: boolean;
+
+    /** Whether the IP address is hosting a VPN. */
+    vpn: boolean;
 
     /** Whether the IP address is a proxy. */
     proxy: boolean;

@@ -1,7 +1,7 @@
 import { z } from "zod";
-import DymoAPI, { type ResilienceConfig } from "dymo-api";
 import type { EmailValidatorRules } from "dymo-api";
 import * as Interfaces from "./lib/types/interfaces";
+import DymoAPI, { type ResilienceConfig } from "dymo-api";
 
 class DymoAPIZod {
     private dymoAPIClient: DymoAPI;
