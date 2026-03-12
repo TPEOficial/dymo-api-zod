@@ -1,6 +1,6 @@
 {
   "name": "@dymo-api/zod",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Flow system for Dymo API.",
   "main": "dist/cjs/dymo-api.cjs",
   "module": "dist/esm/dymo-api.js",
